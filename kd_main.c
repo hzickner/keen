@@ -66,8 +66,6 @@ void	TestSprites(void);
 int		DebugKeys (void);
 void	ShutdownId (void);
 void	Quit (char *error);
-void	InitGame (void);
-void	main (void);
 
 //===========================================================================
 
@@ -402,24 +400,11 @@ void Quit (char *error)
 ==========================
 */
 
-#if 0
-#include "piracy.h"
-#endif
-
 void InitGame (void)
 {
 	int i;
 
 	MM_Startup ();
-
-
-#if 0
-	// Handle piracy screen...
-	//
-	movedata(FP_SEG(PIRACY),(unsigned)PIRACY,0xb800,displayofs,4000);
-	while ((bioskey(0)>>8) != sc_Return);
-#endif
-
 
 #if GRMODE == EGAGR
 	if (mminfo.mainmem < 335l*1024)

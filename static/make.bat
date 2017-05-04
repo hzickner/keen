@@ -9,5 +9,4 @@ makeobj f EGAHEAD.KDR ..\kdrehead.obj EGA_grafixheader _EGAhead
 makeobj f GAMETEXT.KDR ..\gametext.obj
 makeobj c MAPDICT.KDR ..\kdrmdict.obj _mapdict
 makeobj f MAPHEAD.KDR ..\kdrmhead.obj MapHeader _maphead
-makeobj s PIRACY.SCN ..\piracy.h 7
 makeobj f STORY.KDR ..\story.obj
