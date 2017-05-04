@@ -2,4 +2,5 @@
 *.exe
 *.OBJ
 *.EXE
+*.SYM
 PIRACY.H
