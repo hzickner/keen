@@ -101,7 +101,6 @@ void		(* aftersort) (void);
 =============================================================================
 */
 
-boolean		mmstarted;
 
 void far	*farheap;
 void		*nearheap;
@@ -256,10 +255,6 @@ void MM_Startup (void)
 	void far 	*start;
 	unsigned 	segstart,seglength,endfree;
 
-	if (mmstarted)
-		MM_Shutdown ();
-
-	mmstarted = true;
 	bombonerror = true;
 
 //
@@ -377,8 +372,6 @@ void MM_Startup (void)
 
 void MM_Shutdown (void)
 {
-  if (!mmstarted)
-	return;
 
   farfree (farheap);
   free (nearheap);

@@ -379,7 +379,7 @@ void Quit (char *error)
 	puts("    the DOS prompt or call Gamer's Edge at 1-318-221-8311");
 	exit(1);
   }
-
+// TODO remove LOADSCN dependency
 	_argc = 2;
 	_argv[1] = "LAST.SHL";
 	_argv[2] = "ENDSCN.SCN";
