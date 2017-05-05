@@ -609,10 +609,6 @@ US_UpdateTextScreen(void)
 	// Show memory available/used
 	USL_ShowMem(63,15,mminfo.mainmem / 1024);
 	USL_Show(53,15,23,true,true);
-	USL_ShowMem(63,16,mminfo.EMSmem / 1024);
-	USL_Show(53,16,23,mminfo.EMSmem? true : false,true);
-	USL_ShowMem(63,17,mminfo.XMSmem / 1024);
-	USL_Show(53,17,23,mminfo.XMSmem? true : false,true);
 	totalmem = mminfo.mainmem + mminfo.EMSmem + mminfo.XMSmem;
 	USL_ShowMem(63,18,totalmem / 1024);
 	screen = MK_FP(0xb800,1 + (((63 - 1) * 2) + (18 * 80 * 2)));

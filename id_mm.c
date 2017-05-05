@@ -114,127 +114,6 @@ mmblocktype	far mmblocks[MAXBLOCKS]
 // local prototypes
 //
 
-boolean		MML_CheckForEMS (void);
-void 		MML_ShutdownEMS (void);
-void 		MM_MapEMS (void);
-boolean 	MML_CheckForXMS (void);
-void 		MML_ShutdownXMS (void);
-
-//==========================================================================
-
-/*
-======================
-=
-= MML_CheckForEMS
-=
-= Routine from p36 of Extending DOS
-=
-=======================
-*/
-
-boolean MML_CheckForEMS (void)
-{
-  char	emmname[9] = "EMMXXXX0";
-
-asm	mov	dx,OFFSET emmname
-asm	mov	ax,0x3d00
-asm	int	0x21		// try to open EMMXXXX0 device
-asm	jc	error
-
-asm	mov	bx,ax
-asm	mov	ax,0x4400
-
-asm	int	0x21		// get device info
-asm	jc	error
-
-asm	and	dx,0x80
-asm	jz	error
-
-asm	mov	ax,0x4407
-
-asm	int	0x21		// get status
-asm	jc	error
-asm	or	al,al
-asm	jz	error
-
-asm	mov	ah,0x3e
-asm	int	0x21		// close handle
-asm	jc	error
-
-//
-// EMS is good
-//
-  return true;
-
-error:
-//
-// EMS is bad
-//
-  return false;
-}
-
-/*
-======================
-=
-= MML_ShutdownEMS
-=
-=======================
-*/
-
-void MML_ShutdownEMS (void)
-{
-
-}
-
-/*
-====================
-=
-= MM_MapEMS
-=
-= Maps the 64k of EMS used by memory manager into the page frame
-= for general use.  This only needs to be called if you are keeping
-= other things in EMS.
-=
-====================
-*/
-
-void MM_MapEMS (void)
-{
-
-}
-
-//==========================================================================
-
-/*
-======================
-=
-= MML_CheckForXMS
-=
-= Try to allocate an upper memory block
-=
-=======================
-*/
-
-boolean MML_CheckForXMS (void)
-{
-
-	return false;
-}
-
-
-/*
-======================
-=
-= MML_ShutdownXMS
-=
-=======================
-*/
-
-void MML_ShutdownXMS (void)
-{
-
-}
-
 //==========================================================================
 
 /*
@@ -311,33 +190,6 @@ void MM_Startup (void)
 	endfree = segstart+seglength;
 	mmrover = mmnew;
 
-
-//
-// detect EMS and allocate 64K at page frame
-//
-	if (MML_CheckForEMS())
-	{
-		MM_MapEMS();					// map in used pages
-		mminfo.EMSmem = 0x10000l;
-	}
-	else
-	{
-		mminfo.EMSmem = 0;
-	}
-
-//
-// detect XMS and get upper memory blocks
-//
-	if (MML_CheckForXMS())
-	{
-
-	}
-	else
-	{
-		mminfo.XMSmem = 0;
-	}
-
-
 //
 // cap off the list
 //
@@ -375,8 +227,7 @@ void MM_Shutdown (void)
 
   farfree (farheap);
   free (nearheap);
-  MML_ShutdownEMS ();
-  MML_ShutdownXMS ();
+
 }
 
 //==========================================================================
