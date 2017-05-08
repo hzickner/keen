@@ -68,159 +68,6 @@ void	Quit (char *error);
 
 //===========================================================================
 
-#if FRILLS
-
-/*
-==================
-=
-= DebugMemory
-=
-==================
-*/
-
-void DebugMemory (void)
-{
-	VW_FixRefreshBuffer ();
-	US_CenterWindow (16,7);
-
-	US_CPrint ("Memory Usage");
-	US_CPrint ("------------");
-	US_Print ("Total     :");
-	US_PrintUnsigned (mminfo.mainmem/1024);
-	US_Print ("k\nFree      :");
-	US_PrintUnsigned (MM_UnusedMemory()/1024);
-	US_Print ("k\nWith purge:");
-	US_PrintUnsigned (MM_TotalFree()/1024);
-	US_Print ("k\n");
-	VW_UpdateScreen();
-	IN_Ack ();
-#if GRMODE == EGAGR
-	MM_ShowMemory ();
-#endif
-}
-
-/*
-===================
-=
-= TestSprites
-=
-===================
-*/
-
-#define DISPWIDTH	110
-#define	TEXTWIDTH   40
-void TestSprites(void)
-{
-	int hx,hy,sprite,oldsprite,bottomy,topx,shift;
-	spritetabletype far *spr;
-	spritetype _seg	*block;
-	unsigned	mem,scan;
-
-
-	VW_FixRefreshBuffer ();
-	US_CenterWindow (30,17);
-
-	US_CPrint ("Sprite Test");
-	US_CPrint ("-----------");
-
-	hy=PrintY;
-	hx=(PrintX+56)&(~7);
-	topx = hx+TEXTWIDTH;
-
-	US_Print ("Chunk:\nWidth:\nHeight:\nOrgx:\nOrgy:\nXl:\nYl:\nXh:\nYh:\n"
-			  "Shifts:\nMem:\n");
-
-	bottomy = PrintY;
-
-	sprite = STARTSPRITES;
-	shift = 0;
-
-	do
-	{
-		if (sprite>=STARTTILE8)
-			sprite = STARTTILE8-1;
-		else if (sprite<STARTSPRITES)
-			sprite = STARTSPRITES;
-
-		spr = &spritetable[sprite-STARTSPRITES];
-		block = (spritetype _seg *)grsegs[sprite];
-
-		VWB_Bar (hx,hy,TEXTWIDTH,bottomy-hy,WHITE);
-
-		PrintX=hx;
-		PrintY=hy;
-		US_PrintUnsigned (sprite);US_Print ("\n");PrintX=hx;
-		US_PrintUnsigned (spr->width);US_Print ("\n");PrintX=hx;
-		US_PrintUnsigned (spr->height);US_Print ("\n");PrintX=hx;
-		US_PrintSigned (spr->orgx);US_Print ("\n");PrintX=hx;
-		US_PrintSigned (spr->orgy);US_Print ("\n");PrintX=hx;
-		US_PrintSigned (spr->xl);US_Print ("\n");PrintX=hx;
-		US_PrintSigned (spr->yl);US_Print ("\n");PrintX=hx;
-		US_PrintSigned (spr->xh);US_Print ("\n");PrintX=hx;
-		US_PrintSigned (spr->yh);US_Print ("\n");PrintX=hx;
-		US_PrintSigned (spr->shifts);US_Print ("\n");PrintX=hx;
-		if (!block)
-		{
-			US_Print ("-----");
-		}
-		else
-		{
-			mem = block->sourceoffset[3]+5*block->planesize[3];
-			mem = (mem+15)&(~15);		// round to paragraphs
-			US_PrintUnsigned (mem);
-		}
-
-		oldsprite = sprite;
-		do
-		{
-		//
-		// draw the current shift, then wait for key
-		//
-			VWB_Bar(topx,hy,DISPWIDTH,bottomy-hy,WHITE);
-			if (block)
-			{
-				PrintX = topx;
-				PrintY = hy;
-				US_Print ("Shift:");
-				US_PrintUnsigned (shift);
-				US_Print ("\n");
-				VWB_DrawSprite (topx+16+shift*2,PrintY,sprite);
-			}
-
-			VW_UpdateScreen();
-
-			scan = IN_WaitForKey ();
-
-			switch (scan)
-			{
-			case sc_UpArrow:
-				sprite++;
-				break;
-			case sc_DownArrow:
-				sprite--;
-				break;
-			case sc_LeftArrow:
-				if (--shift == -1)
-					shift = 3;
-				break;
-			case sc_RightArrow:
-				if (++shift == 4)
-					shift = 0;
-				break;
-			case sc_Escape:
-				return;
-			}
-
-		} while (sprite == oldsprite);
-
-  } while (1);
-
-
-}
-
-#endif
-
-
 /*
 ================
 =
@@ -232,14 +79,6 @@ int DebugKeys (void)
 {
 	boolean esc;
 	int level;
-
-#if FRILLS
-	if (Keyboard[0x12] && ingame)	// DEBUG: end + 'E' to quit level
-	{
-
-		playstate = levelcomplete;
-	}
-#endif
 
 	if (Keyboard[0x22] && ingame)		// G = god mode
 	{
@@ -279,13 +118,6 @@ int DebugKeys (void)
 		IN_Ack ();
 		return 1;
 	}
-#if FRILLS
-	else if (Keyboard[0x32])			// M = memory info
-	{
-		DebugMemory();
-		return 1;
-	}
-#endif
 	else if (Keyboard[0x19])			// P = pause with no screen disruptioon
 	{
 		IN_Ack();
@@ -303,13 +135,6 @@ int DebugKeys (void)
 		IN_Ack ();
 		return 1;
 	}
-#if FRILLS
-	else if (Keyboard[0x14])			// T = sprite test
-	{
-		TestSprites();
-		return 1;
-	}
-#endif
 	else if (Keyboard[0x11] && ingame)	// W = warp to level
 	{
 		VW_FixRefreshBuffer ();
@@ -368,22 +193,18 @@ void ShutdownId (void)
 void Quit (char *error)
 {
   ShutdownId ();
+
+  clrscr();
   if (error && *error)
   {
-	clrscr();
 	puts(error);
 	puts("\n");
 	puts("For techinical assistance with running this software, type HELP at");
 	puts("    the DOS prompt or call Gamer's Edge at 1-318-221-8311");
 	exit(1);
   }
-// TODO remove LOADSCN dependency
-	_argc = 2;
-	_argv[1] = "LAST.SHL";
-	_argv[2] = "ENDSCN.SCN";
-	_argv[3] = NULL;
-	if (execv("LOADSCN.EXE", _argv) == -1)
-		Quit("Couldn't find executable LOADSCN.EXE.\n");
+  puts("clean exit\n");
+  exit(0);
 }
 
 //===========================================================================

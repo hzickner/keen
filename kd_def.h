@@ -23,9 +23,6 @@
 #include "SOFT.H"
 #include "SL_FILE.H"
 
-#define FRILLS	0			// Cut out frills for 360K - MIKE MAYNARD
-#define CREDITS 0
-
 /*
 =============================================================================
 
@@ -196,7 +193,6 @@ void	GameOver (void);
 void	DemoLoop (void);
 void	StatusWindow (void);
 void	NewGame (void);
-void	TEDDeath (void);
 
 boolean	LoadGame (int file);
 boolean	SaveGame (int file);

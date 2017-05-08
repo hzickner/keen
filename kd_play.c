@@ -1874,10 +1874,6 @@ startlevel:
 
 		PlayLoop ();
 
-#if FRILLS
-
-#endif
-
 		if (loadedgame)
 			goto startlevel;
 

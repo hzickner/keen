@@ -77,11 +77,6 @@ typedef	struct
 			char	name[MaxGameName + 1];
 		} SaveGame;
 
-//	Hack import for TED launch support
-extern	void		TEDDeath(void);
-static	char		*ParmStrings[] = {"TEDLEVEL",""};
-
-
 //	Global variables
 		boolean		ingame,abortgame,loadedgame;
 		char		*abortprogram;
@@ -501,8 +496,7 @@ USL_ClearTextScreen(void)
 void
 US_TextScreen(void)
 {
-	word	i,
-			sx,sy;
+	word sx,sy;
 
 	USL_ClearTextScreen();
 
@@ -3519,9 +3513,7 @@ US_ControlPanel(void)
 
 	if (QuitToDos)
 	{
-#if FRILLS
 
-#endif
 		{
 			US_CenterWindow(20,3);
 			fontcolor = F_SECONDCOLOR;
