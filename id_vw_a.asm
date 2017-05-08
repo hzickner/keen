@@ -376,12 +376,6 @@ TestSequence	DB	TRUE	; this list of flags and addresses
 EGAflag	DB	?	;  subsystems
 	DW	FindEGA
 
-CGAflag	DB	?
-	DW	FindCGA
-
-Monoflag	DB	?
-	DW	FindMono
-
 NumberOfTests	EQU	($-TestSequence)/3
 
 
@@ -409,9 +403,7 @@ VW_VideoID	PROC
 ; tabulated in TestSequence; each subroutine sets flags in TestSequence
 ; to indicate whether subsequent subroutines need to be called
 
-	mov	byte ptr CGAflag,TRUE
 	mov	byte ptr EGAflag,TRUE
-	mov	byte ptr Monoflag,TRUE
 
 	mov	cx,NumberOfTests
 	mov	si,offset TestSequence
@@ -486,9 +478,7 @@ FindPS2	PROC	near
 
 ; reset flags for subsystems that have been ruled out
 
-	mov	byte ptr CGAflag,FALSE
 	mov	byte ptr EGAflag,FALSE
-	mov	byte ptr Monoflag,FALSE
 
 	lea	bx,Video0Type[di]  ; if the BIOS reported an MDA ...
 	cmp	byte ptr [bx],MDA
@@ -499,7 +489,6 @@ FindPS2	PROC	near
 	jne	@@L13
 
 @@L12:	mov	word ptr [bx],0    ; ... Hercules can't be ruled out
-	mov	byte ptr Monoflag,TRUE
 
 @@L13:	ret
 
@@ -537,95 +526,13 @@ FindEGA	PROC	near	; Caller:	AH = flags
 	cmp	ah,MDADisplay
 	je	@@L21	; jump if EGA has a monochrome display
 
-	mov	CGAflag,FALSE	; no CGA if EGA has color display
 	jmp	short @@L22
 
-@@L21:	mov	Monoflag,FALSE	; EGA has a mono display, so MDA and
-			;  Hercules are ruled out
+@@L21:
+
 @@L22:	ret
 
 FindEGA	ENDP
-
-;
-; FindCGA
-;
-; This is done by looking for the CGA's 6845 CRTC at I/O port 3D4H.
-;
-FindCGA	PROC	near	; Returns:	VIDstruct updated
-
-	mov	dx,3D4h	; DX := CRTC address port
-	call	Find6845
-	jc	@@L31	; jump if not present
-
-	mov	al,CGA
-	mov	ah,CGADisplay
-	call	FoundDevice
-
-@@L31:	ret
-
-FindCGA	ENDP
-
-;
-; FindMono
-;
-; This is done by looking for the MDA's 6845 CRTC at I/O port 3B4H.  If
-; a 6845 is found, the subroutine distinguishes between an MDA
-; and a Hercules adapter by monitoring bit 7 of the CRT Status byte.
-; This bit changes on Hercules adapters but does not change on an MDA.
-;
-; The various Hercules adapters are identified by bits 4 through 6 of
-; the CRT Status value:
-;
-; 000b = HGC
-; 001b = HGC+
-; 101b = InColor card
-;
-
-FindMono	PROC	near	; Returns:	VIDstruct updated
-
-	mov	dx,3B4h	; DX := CRTC address port
-	call	Find6845
-	jc	@@L44	; jump if not present
-
-	mov	dl,0BAh	; DX := 3BAh (status port)
-	in	al,dx
-	and	al,80h
-	mov	ah,al	; AH := bit 7 (vertical sync on HGC)
-
-	mov	cx,8000h	; do this 32768 times
-@@L41:	in	al,dx
-	and	al,80h	; isolate bit 7
-	cmp	ah,al
-	loope	@@L41	; wait for bit 7 to change
-	jne	@@L42	; if bit 7 changed, it's a Hercules
-
-	mov	al,MDA	; if bit 7 didn't change, it's an MDA
-	mov	ah,MDADisplay
-	call	FoundDevice
-	jmp	short @@L44
-
-@@L42:	in	al,dx
-	mov	dl,al	; DL := value from status port
-	and	dl,01110000b	; mask bits 4 thru 6
-
-	mov	ah,MDADisplay	; assume it's a monochrome display
-
-	mov	al,HGCPlus	; look for an HGC+
-	cmp	dl,00010000b
-	je	@@L43	; jump if it's an HGC+
-
-	mov	al,HGC	; look for an InColor card or HGC
-	cmp	dl,01010000b
-	jne	@@L43	; jump if it's not an InColor card
-
-	mov	al,InColor	; it's an InColor card
-	mov	ah,EGAColorDisplay
-
-@@L43:	call	FoundDevice
-
-@@L44:	ret
-
-FindMono	ENDP
 
 ;
 ; Find6845

@@ -193,8 +193,6 @@ extern	unsigned	**shifttabletable;
 void	VW_Startup (void);
 void	VW_Shutdown (void);
 
-cardtype	VW_VideoID (void);
-
 //
 // EGA hardware routines
 //

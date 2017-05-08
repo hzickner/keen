@@ -101,33 +101,16 @@ extern	unsigned	bufferwidth,bufferheight;	// used by font drawing stuff
 =======================
 */
 
-static	char *ParmStrings[] = {"HIDDENCARD",""};
 
 void	VW_Startup (void)
 {
-	int i;
 
 	asm	cld;
 
-	videocard = 0;
+	videocard = EGAcard;
 
-	for (i = 1;i < _argc;i++)
-		if (US_CheckParm(_argv[i],ParmStrings) == 0)
-		{
-			videocard = EGAcard;
-			break;
-		}
-
-	if (!videocard)
-		videocard = VW_VideoID ();
-
-#if GRMODE == EGAGR
 	grmode = EGAGR;
-	if (videocard != EGAcard && videocard != VGAcard)
-Quit ("Improper video card!  If you really have an EGA/VGA card that I am not \n"
-	  "detecting, use the -HIDDENCARD command line parameter!");
 	EGAWRITEMODE(0);
-#endif
 
 	cursorvisible = 0;
 }
