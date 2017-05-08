@@ -69,9 +69,6 @@ void MM_SetPurge (memptr *baseptr, int purge);
 void MM_SetLock (memptr *baseptr, boolean locked);
 void MM_SortMem (void);
 
-void MM_ShowMemory (void);
-
-long MM_UnusedMemory (void);
 long MM_TotalFree (void);
 
 
