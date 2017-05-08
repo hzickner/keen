@@ -1,10 +1,10 @@
 # Makefile for kdreams.exe
 
 CC = bcc
-CFLAGS = -IC:\BC2\INCLUDE -c -1- -a- -O -d -f- -G- -mm -v-
+CFLAGS = -IC:\BC2\INCLUDE -c -mm
 
 LD = bcc
-LDFLAGS = -LC:\BC2\LIB -1- -a- -O -d -f- -G- -mm -v-
+LDFLAGS = -LC:\BC2\LIB -mm
 
 AS = tasm
 ASFLAGS = /mx /o
@@ -33,7 +33,7 @@ kdredict.obj: makeobj.exe static/EGADICT.KDR
 	makeobj c static\EGADICT.KDR kdredict.obj _EGAdict
 	
 kdrehead.obj: makeobj.exe static/EGAHEAD.KDR
-	makeobj f EGAHEAD.KDR kdrehead.obj EGA_grafixheader _EGAhead
+	makeobj f static\EGAHEAD.KDR kdrehead.obj EGA_grafixheader _EGAhead
 
 kdrmdict.obj: makeobj.exe static/MAPDICT.KDR
 	makeobj c static\MAPDICT.KDR kdrmdict.obj _mapdict
