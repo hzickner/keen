@@ -171,8 +171,7 @@ typedef struct {
 */
 
 extern	char	str[80],str2[20];
-extern	boolean	singlestep,jumpcheat,godmode,tedlevel;
-extern	unsigned	tedlevelnum;
+extern	boolean	singlestep,jumpcheat,godmode;
 
 void	DebugMemory (void);
 void	TestSprites(void);

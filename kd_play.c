@@ -1875,13 +1875,7 @@ startlevel:
 		PlayLoop ();
 
 #if FRILLS
-		if (tedlevel)
-		{
-			if (playstate == died)
-				goto startlevel;
-			else
-				TEDDeath ();
-		}
+
 #endif
 
 		if (loadedgame)

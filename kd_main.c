@@ -50,8 +50,7 @@
 */
 
 char		str[80],str2[20];
-boolean		singlestep,jumpcheat,godmode,tedlevel;
-unsigned	tedlevelnum;
+boolean		singlestep,jumpcheat,godmode;
 
 /*
 =============================================================================
@@ -237,8 +236,7 @@ int DebugKeys (void)
 #if FRILLS
 	if (Keyboard[0x12] && ingame)	// DEBUG: end + 'E' to quit level
 	{
-		if (tedlevel)
-			TEDDeath();
+
 		playstate = levelcomplete;
 	}
 #endif

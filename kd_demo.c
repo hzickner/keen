@@ -447,13 +447,7 @@ DemoLoop (void)
 //
 // check for launch from ted
 //
-	if (tedlevel)
-	{
-		NewGame();
-		gamestate.mapon = tedlevelnum;
-		GameLoop();
-		TEDDeath();
-	}
+
 #endif
 
 //

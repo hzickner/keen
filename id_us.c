@@ -78,8 +78,6 @@ typedef	struct
 		} SaveGame;
 
 //	Hack import for TED launch support
-extern	boolean		tedlevel;
-extern	word		tedlevelnum;
 extern	void		TEDDeath(void);
 static	char		*ParmStrings[] = {"TEDLEVEL",""};
 
@@ -212,8 +210,6 @@ oh_kill_me:
 	abortprogram = s;
 	ShutdownId();
 	fprintf(stderr,"Terminal Error: %s\n",s);
-	if (tedlevel)
-		fprintf(stderr,"You launched from TED. I suggest that you reboot...\n");
 
 	return(ABORT);
 #undef	IGNORE
@@ -516,21 +512,6 @@ scr_rowcol(19,33)      scr_aputs("Please standby...",0x4E);
 #undef	scr_rowcol
 #undef	scr_aputs
 
-	// Check for TED launching here
-	for (i = 1;i < _argc;i++)
-	{
-		if (US_CheckParm(_argv[i],ParmStrings) == 0)
-		{
-			tedlevelnum = atoi(_argv[i + 1]);
-			if (tedlevelnum >= 0)
-			{
-				tedlevel = true;
-				return;
-			}
-			else
-				break;
-		}
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -639,11 +620,9 @@ US_FinishTextScreen(void)
 	// Change Loading... to Press a Key
 	USL_ScreenDraw(30, 18, "Ready - Press a Key",0xCE);
 
-	if (!tedlevel)
-	{
-		IN_ClearKeysDown();
-		IN_Ack();
-	}
+	IN_ClearKeysDown();
+	IN_Ack();
+
 	IN_ClearKeysDown();
 
 	USL_ClearTextScreen();
@@ -3541,9 +3520,7 @@ US_ControlPanel(void)
 	if (QuitToDos)
 	{
 #if FRILLS
-		if (tedlevel)
-			TEDDeath();
-		else
+
 #endif
 		{
 			US_CenterWindow(20,3);
