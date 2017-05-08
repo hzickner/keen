@@ -510,6 +510,12 @@ US_TextScreen(void)
 
 	USL_ClearTextScreen();
 
+#define	scr_rowcol(y,x)	{sx = (x) - 1;sy = (y) - 1;}
+#define	scr_aputs(s,a)	USL_ScreenDraw(sx,sy,(s),(a))
+scr_rowcol(19,33)      scr_aputs("Please standby...",0x4E);
+#undef	scr_rowcol
+#undef	scr_aputs
+
 	// Check for TED launching here
 	for (i = 1;i < _argc;i++)
 	{
