@@ -1,0 +1,6 @@
+Compiler flags needed
+
+-mm	memory model medium, near data (1 segment), far code (multiple segments)
+
+-K	unsigned chars
+	with signed chars you get a wrong layout of the highscore screeen

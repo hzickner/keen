@@ -1,10 +1,13 @@
 # Makefile for kdreams.exe
 
 CC = bcc
-CFLAGS = -IC:\BC2\INCLUDE -c -mm
+CFLAGS = -IC:\BC2\INCLUDE -c -mm -K
+# we need:
+# -mm	memory model medium
+# -K	unsigned chars
 
 LD = bcc
-LDFLAGS = -LC:\BC2\LIB -mm
+LDFLAGS = -LC:\BC2\LIB -mm -K
 
 AS = tasm
 ASFLAGS = /mx /o
