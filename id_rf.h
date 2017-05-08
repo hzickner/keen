@@ -115,7 +115,6 @@ extern unsigned	uwidthtable[UPDATEHIGH];		// lookup instead of multiple
 */
 
 void RF_Startup (void);
-void RF_Shutdown (void);
 
 void RF_NewMap (void);
 void RF_MarkTileGraphics (void);

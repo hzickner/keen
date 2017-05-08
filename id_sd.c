@@ -90,7 +90,6 @@ static	word			sqMode,sqFadeStep;
 	word		ssPort = 2;
 
 //	Internal variables
-static	boolean			SD_Started;
 static	boolean			TimerDone;
 static	word			TimerVal,TimerDelay10,TimerDelay25,TimerDelay100;
 static	char			*ParmStrings[] =
@@ -1391,9 +1390,6 @@ SD_Startup(void)
 {
 	int	i;
 
-	if (SD_Started)
-		return;
-
 	ssNoCheck = false;
 	ssIsTandy = false;
 	alNoCheck = false;
@@ -1460,7 +1456,6 @@ SD_Startup(void)
 	for (i = 0;i < 255;i++)
 		pcSoundLookup[i] = i * 60;
 
-	SD_Started = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1543,9 +1538,6 @@ SD_Default(boolean gotit,SDMode sd,SMMode sm)
 void
 SD_Shutdown(void)
 {
-	if (!SD_Started)
-		return;
-
 	SDL_ShutDevice();
 
 	asm	pushf
@@ -1557,8 +1549,6 @@ SD_Shutdown(void)
 
 	asm	popf
 	// DEBUG - set the system clock
-
-	SD_Started = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////

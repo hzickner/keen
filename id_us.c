@@ -85,7 +85,6 @@ typedef	struct
 		word		WindowX,WindowY,WindowW,WindowH;
 
 //	Internal variables
-static	boolean		US_Started;
 static	boolean		GameIsDirty,
 					HighScoresDirty,
 					QuitToDos,
@@ -369,16 +368,11 @@ USL_CheckSavedGames(void)
 void
 US_Startup(void)
 {
-	if (US_Started)
-		return;
-
 	harderr(USL_HardError);	// Install the fatal error handler
 
 	US_InitRndT(true);		// Initialize the random number generator
 
 	USL_ReadConfig();		// Read config file
-
-	US_Started = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -400,13 +394,8 @@ US_Setup(void)
 void
 US_Shutdown(void)
 {
-	if (!US_Started)
-		return;
-
 	if (!abortprogram)
 		USL_WriteConfig();
-
-	US_Started = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -545,60 +534,6 @@ USL_ShowMem(word x,word y,long mem)
 		USL_ScreenDraw(x++,y," ",0x48);
 	USL_ScreenDraw(x,y,buf,0x48);
 }
-
-
-#if 0
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_UpdateTextScreen() - Called after the ID libraries are started up.
-//		Displays what hardware is present.
-//
-///////////////////////////////////////////////////////////////////////////
-void
-US_UpdateTextScreen(void)
-{
-	boolean		b;
-	byte		far *screen;
-	word		i;
-	longword	totalmem;
-
-	// Show video card info
-	b = (grmode == EGAGR);
-	USL_Show(21,8,4,(videocard >= EGAcard) && (videocard <= VGAcard),b);
-	b = (grmode == VGAGR);
-	USL_Show(21,9,4,videocard == VGAcard,b);
-	if (compatability)
-		USL_ScreenDraw(5,10,"SVGA Compatibility Mode Enabled.",0x4f);
-
-	// Show input device info
-	USL_Show(60,7,8,true,true);
-	USL_Show(60,8,11,JoysPresent[0],true);
-	USL_Show(60,9,11,JoysPresent[1],true);
-	USL_Show(60,10,5,MousePresent,true);
-
-	// Show sound hardware info
-	USL_Show(21,14,11,true,SoundMode == sdm_PC);
-	b = (SoundMode == sdm_AdLib) || (MusicMode == smm_AdLib);
-	USL_Show(21,15,5,AdLibPresent && !SoundBlasterPresent,
-				b && !SoundBlasterPresent);
-	USL_Show(21,16,13,SoundBlasterPresent,
-			SoundBlasterPresent && (b || (SoundMode == sdm_SoundBlaster)));
-	USL_Show(21,17,13,SoundSourcePresent,SoundMode == sdm_SoundSource);
-
-	// Show memory available/used
-	USL_ShowMem(63,15,mminfo.mainmem / 1024);
-	USL_Show(53,15,23,true,true);
-	totalmem = mminfo.mainmem + mminfo.EMSmem + mminfo.XMSmem;
-	USL_ShowMem(63,18,totalmem / 1024);
-	screen = MK_FP(0xb800,1 + (((63 - 1) * 2) + (18 * 80 * 2)));
-	for (i = 0;i < 13;i++,screen += 2)
-		*screen = 0x4f;
-
-	// Change Initializing... to Loading...
-	USL_ScreenDraw(27,22,"  Loading...   ",0x9c);
-}
-
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //

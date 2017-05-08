@@ -66,7 +66,6 @@
 		ControlType	Controls[MaxPlayers];
 
 //	Internal variables
-static	boolean		IN_Started;
 static	boolean		CapsLock;
 static	ScanCode	CurCode,LastCode;
 static	byte        ASCIINames[] =		// Unshifted ASCII for scan codes
@@ -593,9 +592,6 @@ IN_Startup(void)
 	boolean	checkjoys,checkmouse;
 	word	i;
 
-	if (IN_Started)
-		return;
-
 	checkjoys = true;
 	checkmouse = true;
 	for (i = 1;i < _argc;i++)
@@ -617,7 +613,6 @@ IN_Startup(void)
 	for (i = 0;i < MaxJoys;i++)
 		JoysPresent[i] = checkjoys? INL_StartJoy(i) : false;
 
-	IN_Started = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -647,13 +642,10 @@ IN_Default(boolean gotit,ControlType in)
 void
 IN_Shutdown(void)
 {
-	if (!IN_Started)
-		return;
 
 	INL_ShutMouse();
 	INL_ShutKbd();
 
-	IN_Started = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////

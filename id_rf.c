@@ -256,13 +256,12 @@ void RF_Startup (void)
 	int i,x,y;
 	unsigned	*blockstart;
 
-	if (grmode == EGAGR)
-		for (i = 1;i < _argc;i++)
-			if (US_CheckParm(_argv[i],ParmStrings) == 0)
-			{
-				compatability = true;
-				break;
-			}
+	for (i = 1;i < _argc;i++)
+		if (US_CheckParm(_argv[i],ParmStrings) == 0)
+		{
+			compatability = true;
+			break;
+		}
 
 	for (i=0;i<PORTTILESHIGH;i++)
 		uwidthtable[i] = UPDATEWIDE*i;
@@ -272,46 +271,25 @@ void RF_Startup (void)
 	eraselistptr[0] = &eraselist[0][0];
 	eraselistptr[1] = &eraselist[1][0];
 
+	SX_T_SHIFT = 1;
 
+	baseupdatestart[0] = &update[0][UPDATESPARESIZE];
+	baseupdatestart[1] = &update[1][UPDATESPARESIZE];
 
-	if (grmode == EGAGR)
-	{
-		SX_T_SHIFT = 1;
+	screenpage = 0;
+	otherpage = 1;
+	displayofs = screenstart[screenpage];
+	bufferofs = screenstart[otherpage];
+	masterofs = screenstart[2];
 
-		baseupdatestart[0] = &update[0][UPDATESPARESIZE];
-		baseupdatestart[1] = &update[1][UPDATESPARESIZE];
+	updateptr = baseupdatestart[otherpage];
 
-		screenpage = 0;
-		otherpage = 1;
-		displayofs = screenstart[screenpage];
-		bufferofs = screenstart[otherpage];
-		masterofs = screenstart[2];
+	blockstart = &blockstarts[0];
+	for (y=0;y<UPDATEHIGH;y++)
+		for (x=0;x<UPDATEWIDE;x++)
+			*blockstart++ = SCREENWIDTH*16*y+x*TILEWIDTH;
 
-		updateptr = baseupdatestart[otherpage];
-
-		blockstart = &blockstarts[0];
-		for (y=0;y<UPDATEHIGH;y++)
-			for (x=0;x<UPDATEWIDE;x++)
-				*blockstart++ = SCREENWIDTH*16*y+x*TILEWIDTH;
-
-		xpanmask = 6;	// dont pan to odd pixels
-	}
-
-}
-
-
-
-
-/*
-=====================
-=
-= RF_Shutdown
-=
-=====================
-*/
-
-void RF_Shutdown (void)
-{
+	xpanmask = 6;	// dont pan to odd pixels
 
 }
 

@@ -172,7 +172,6 @@ void ShutdownId (void)
   US_Shutdown ();
   SD_Shutdown ();
   IN_Shutdown ();
-  RF_Shutdown ();
   VW_Shutdown ();
   CA_Shutdown ();
   MM_Shutdown ();
@@ -221,7 +220,6 @@ void InitGame (void)
 
 	MM_Startup ();
 
-#if GRMODE == EGAGR
 	if (mminfo.mainmem < 335l*1024)
 	{
 
@@ -230,7 +228,6 @@ void InitGame (void)
 
 		Quit ("not enough memory");
 	}
-#endif
 
 	US_TextScreen();
 
@@ -239,8 +236,6 @@ void InitGame (void)
 	IN_Startup ();
 	SD_Startup ();
 	US_Startup ();
-
-//	US_UpdateTextScreen();
 
 	CA_Startup ();
 	US_Setup ();
