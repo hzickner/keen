@@ -100,10 +100,6 @@ extern	unsigned	masterofs;
 
 extern	byte		*updateptr;				// current start of update window
 
-#if GRMODE == CGAGR
-extern	byte		*baseupdateptr;
-#endif
-
 extern unsigned	blockstarts[UPDATEWIDE*UPDATEHIGH];
 extern unsigned	updatemapofs[UPDATEWIDE*UPDATEHIGH];
 extern unsigned	uwidthtable[UPDATEHIGH];		// lookup instead of multiple

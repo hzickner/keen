@@ -38,10 +38,6 @@
 #define SCREENXDIV		(8)
 #endif
 
-#if GRMODE == CGAGR
-#define SCREENXMASK		(~3)
-#define SCREENXDIV		(4)
-#endif
 /*
 =============================================================================
 
@@ -133,14 +129,6 @@ Quit ("Improper video card!  If you really have an EGA/VGA card that I am not \n
 	EGAWRITEMODE(0);
 #endif
 
-#if GRMODE == CGAGR
-	grmode = CGAGR;
-	if (videocard < CGAcard || videocard > VGAcard)
-Quit ("Improper video card!  If you really have a CGA card that I am not \n"
-	  "detecting, use the -HIDDENCARD command line parameter!");
-	MM_GetPtr (&(memptr)screenseg,0x10000l);	// grab 64k for floating screen
-#endif
-
 	cursorvisible = 0;
 }
 
@@ -180,9 +168,6 @@ void VW_SetScreenMode (int grmode)
 	  case TEXTGR:  _AX = 3;
 		  geninterrupt (0x10);
 		  screenseg=0xb000;
-		  break;
-	  case CGAGR: _AX = 4;
-		  geninterrupt (0x10);		// screenseg is actually a main mem buffer
 		  break;
 	  case EGAGR: _AX = 0xd;
 		  geninterrupt (0x10);
@@ -482,9 +467,6 @@ void VW_DrawSprite(int x, int y, unsigned chunknum)
 #if GRMODE == EGAGR
 	shift = (x&7)/2;
 #endif
-#if GRMODE == CGAGR
-	shift = 0;
-#endif
 
 	dest = bufferofs + ylookup[y];
 	if (x>=0)
@@ -592,92 +574,6 @@ done:
 }
 #endif
 
-
-#if GRMODE == CGAGR
-
-unsigned char pixmask[4] = {0xc0,0x30,0x0c,0x03};
-unsigned char leftmask[4] = {0xff,0x3f,0x0f,0x03};
-unsigned char rightmask[4] = {0xc0,0xf0,0xfc,0xff};
-unsigned char colorbyte[4] = {0,0x55,0xaa,0xff};
-
-//
-// could be optimized for rep stosw
-//
-void VW_Hlin(unsigned xl, unsigned xh, unsigned y, unsigned color)
-{
-	unsigned dest,xlb,xhb,mid;
-	byte maskleft,maskright;
-
-	color = colorbyte[color];	// expand 2 color bits to 8
-
-	xlb=xl/4;
-	xhb=xh/4;
-
-	maskleft = leftmask[xl&3];
-	maskright = rightmask[xh&3];
-
-	mid = xhb-xlb-1;
-	dest = bufferofs+ylookup[y]+xlb;
-asm	mov	es,[screenseg]
-
-	if (xlb==xhb)
-	{
-	//
-	// entire line is in one byte
-	//
-		maskleft&=maskright;
-
-		asm	mov	ah,[maskleft]
-		asm	mov	bl,[BYTE PTR color]
-		asm	and	bl,[maskleft]
-		asm	not	ah
-
-		asm	mov	di,[dest]
-
-		asm	mov	al,[es:di]
-		asm	and	al,ah			// mask out pixels
-		asm	or	al,bl			// or in color
-		asm	mov	[es:di],al
-		return;
-	}
-
-asm	mov	di,[dest]
-asm	mov	bh,[BYTE PTR color]
-
-//
-// draw left side
-//
-asm	mov	ah,[maskleft]
-asm	mov	bl,bh
-asm	and	bl,[maskleft]
-asm	not	ah
-asm	mov	al,[es:di]
-asm	and	al,ah			// mask out pixels
-asm	or	al,bl			// or in color
-asm	stosb
-
-//
-// draw middle
-//
-asm	mov	al,bh
-asm	mov	cx,[mid]
-asm	rep	stosb
-
-//
-// draw right side
-//
-asm	mov	ah,[maskright]
-asm	mov	bl,bh
-asm	and	bl,[maskright]
-asm	not	ah
-asm	mov	al,[es:di]
-asm	and	al,ah			// mask out pixels
-asm	or	al,bl			// or in color
-asm	stosb
-}
-#endif
-
-
 /*
 ==================
 =
@@ -687,20 +583,6 @@ asm	stosb
 =
 ==================
 */
-
-#if GRMODE == CGAGR
-
-void VW_Bar (unsigned x, unsigned y, unsigned width, unsigned height,
-	unsigned color)
-{
-	unsigned xh = x+width-1;
-
-	while (height--)
-		VW_Hlin (x,xh,y++,color);
-}
-
-#endif
-
 
 #if	GRMODE == EGAGR
 
@@ -828,107 +710,6 @@ void	VW_MeasurePropString (char far *string, word *width, word *height)
 void	VW_MeasureMPropString  (char far *string, word *width, word *height)
 {
 	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONTM]);
-}
-
-
-#endif
-
-
-/*
-=============================================================================
-
-							CGA stuff
-
-=============================================================================
-*/
-
-#if GRMODE == CGAGR
-
-#define CGACRTCWIDTH	40
-
-/*
-==========================
-=
-= VW_CGAFullUpdate
-=
-==========================
-*/
-
-void VW_CGAFullUpdate (void)
-{
-	byte	*update;
-	boolean	halftile;
-	unsigned	x,y,middlerows,middlecollumns;
-
-	displayofs = bufferofs+panadjust;
-
-asm	mov	ax,0xb800
-asm	mov	es,ax
-
-asm	mov	si,[displayofs]
-asm	xor	di,di
-
-asm	mov	bx,100				// pairs of scan lines to copy
-asm	mov	dx,[linewidth]
-asm	sub	dx,80
-
-asm	mov	ds,[screenseg]
-asm	test	si,1
-asm	jz	evenblock
-
-//
-// odd source
-//
-asm	mov	ax,39				// words accross screen
-copytwolineso:
-asm	movsb
-asm	mov	cx,ax
-asm	rep	movsw
-asm	movsb
-asm	add	si,dx
-asm	add	di,0x2000-80		// go to the interlaced bank
-asm	movsb
-asm	mov	cx,ax
-asm	rep	movsw
-asm	movsb
-asm	add	si,dx
-asm	sub	di,0x2000			// go to the non interlaced bank
-
-asm	dec	bx
-asm	jnz	copytwolineso
-asm	jmp	blitdone
-
-//
-// even source
-//
-evenblock:
-asm	mov	ax,40				// words accross screen
-copytwolines:
-asm	mov	cx,ax
-asm	rep	movsw
-asm	add	si,dx
-asm	add	di,0x2000-80		// go to the interlaced bank
-asm	mov	cx,ax
-asm	rep	movsw
-asm	add	si,dx
-asm	sub	di,0x2000			// go to the non interlaced bank
-
-asm	dec	bx
-asm	jnz	copytwolines
-
-blitdone:
-asm	mov	ax,ss
-asm	mov	ds,ax
-asm	mov	es,ax
-
-asm	xor	ax,ax				// clear out the update matrix
-asm	mov	cx,UPDATEWIDE*UPDATEHIGH/2
-
-asm	mov	di,[baseupdateptr]
-asm	rep	stosw
-
-	updateptr = baseupdateptr;
-	*(unsigned *)(updateptr + UPDATEWIDE*PORTTILESHIGH) = UPDATETERMINATE;
 }
 
 
@@ -1212,9 +993,6 @@ asm	out	dx,al
 asm	sti
 
 #endif
-#if GRMODE == CGAGR
-	VW_CGAFullUpdate();
-#endif
 
 	if (cursorvisible>0)
 		VWL_EraseCursor();
@@ -1357,9 +1135,6 @@ void VWB_DrawSprite(int x, int y, int chunknum)
 
 #if GRMODE == EGAGR
 	shift = (x&7)/2;
-#endif
-#if GRMODE == CGAGR
-	shift = 0;
 #endif
 
 	dest = bufferofs + ylookup[y];

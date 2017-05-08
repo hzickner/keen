@@ -60,8 +60,6 @@ boolean		singlestep,jumpcheat,godmode;
 =============================================================================
 */
 
-void	DebugMemory (void);
-void	TestSprites(void);
 int		DebugKeys (void);
 void	ShutdownId (void);
 void	Quit (char *error);
@@ -199,11 +197,9 @@ void Quit (char *error)
   {
 	puts(error);
 	puts("\n");
-	puts("For techinical assistance with running this software, type HELP at");
-	puts("    the DOS prompt or call Gamer's Edge at 1-318-221-8311");
 	exit(1);
   }
-  puts("clean exit\n");
+  puts("Good bye.");
   exit(0);
 }
 
@@ -228,20 +224,11 @@ void InitGame (void)
 #if GRMODE == EGAGR
 	if (mminfo.mainmem < 335l*1024)
 	{
-#pragma	warn	-pro
-#pragma	warn	-nod
+
 		textbackground(0);
 		clrscr();			// we can't include CONIO because of a name conflict
-#pragma	warn	+nod
-#pragma	warn	+pro
-		puts ("There is not enough memory available to play the game reliably.  You can");
-		puts ("play anyway, but an out of memory condition will eventually pop up.  The");
-		puts ("correct solution is to unload some TSRs or rename your CONFIG.SYS and");
-		puts ("AUTOEXEC.BAT to free up more memory.\n");
-		puts ("Do you want to (Q)uit, or (C)ontinue?");
-		i = bioskey (0);
-		if ( (i>>8) != sc_C)
-			Quit ("");
+
+		Quit ("not enough memory");
 	}
 #endif
 

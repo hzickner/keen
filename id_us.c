@@ -563,8 +563,6 @@ US_UpdateTextScreen(void)
 	longword	totalmem;
 
 	// Show video card info
-	b = (grmode == CGAGR);
-	USL_Show(21,7,4,(videocard >= CGAcard) && (videocard <= VGAcard),b);
 	b = (grmode == EGAGR);
 	USL_Show(21,8,4,(videocard >= EGAcard) && (videocard <= VGAcard),b);
 	b = (grmode == VGAGR);
@@ -1787,10 +1785,7 @@ USL_GlideCursor(long newx,long newy)
 	long	x,y,
 			dx,dy;
 
-	if (grmode == CGAGR)
-		steps = 1;
-	else
-		steps = 8;
+	steps = 8;
 
 	x = (long)CursorX << 16;
 	dx = ((newx << 16) - x) / steps;
@@ -2365,12 +2360,7 @@ USL_DoHelp(memptr text,long len)
 			}
 			if (scroll)
 			{
-				if (grmode == CGAGR)
-				{
-					pixdiv = 4;
-					base = bufferofs + panadjust + (WindowX / pixdiv);
-				}
-				else if (grmode == EGAGR)
+				if (grmode == EGAGR)
 				{
 					VWB_Bar(WindowX,WindowY + (loc * h),WindowW,num * h,WHITE);
 					USL_DrawHelp((char far *)text,top,top + num,loc,h,lp);
@@ -2402,13 +2392,7 @@ USL_DoHelp(memptr text,long len)
 					for (i = page - 1;i;i--,srcbase -= base,destbase -= base)
 						VW_ScreenToScreen(srcbase,destbase,WindowW / pixdiv,h);
 				}
-				if (grmode == CGAGR)
-				{
-					VWB_Bar(WindowX,WindowY + (loc * h),WindowW,num * h,WHITE);
-					USL_DrawHelp((char far *)text,top,top + num,loc,h,lp);
-					VW_UpdateScreen();
-				}
-				else if (grmode == EGAGR)
+				if (grmode == EGAGR)
 				{
 					base = panadjust + (WindowX / pixdiv) +
 							ylookup[WindowY + (loc * h)];

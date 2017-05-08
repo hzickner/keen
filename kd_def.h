@@ -170,8 +170,6 @@ typedef struct {
 extern	char	str[80],str2[20];
 extern	boolean	singlestep,jumpcheat,godmode;
 
-void	DebugMemory (void);
-void	TestSprites(void);
 int		DebugKeys (void);
 void	StartupId (void);
 void	ShutdownId (void);
