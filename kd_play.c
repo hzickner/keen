@@ -799,7 +799,9 @@ void ScrollScreen (void)
 	if (player->left < originxmin
 	|| player->right > originxmax+20*TILEGLOBAL)
 	{
-		playstate = levelcomplete;
+// TODO	
+//		playstate = levelcomplete;
+		playstate = victorious;
 		return;
 	}
 
@@ -1640,94 +1642,8 @@ void PlayLoop (void)
 	ingame = false;
 }
 
-
 //==========================================================================
 
-/*
-==========================
-=
-= GameFinale
-=
-==========================
-*/
-
-void GameFinale (void)
-{
-struct date d;
-
-	VW_FixRefreshBuffer ();
-
-/* screen 1 of finale text (16 lines) */
-	US_CenterWindow (30,21);
-	PrintY += 4;
-	US_CPrint (
-"Yes!  Boobus Tuber's hash-brown-\n"
-"like remains rained down from\n"
-"the skies as Commander Keen\n"
-"walked up to the Dream Machine.\n"
-"He analyzed all the complex\n"
-"controls and readouts on it, then\n"
-"pulled down a huge red lever\n"
-"marked \"On/Off Switch.\"  The\n"
-"machine clanked and rattled,\n"
-"then went silent. He had freed\n"
-"all the children from their\n"
-"vegetable-enforced slavery!\n"
-"Everything around Keen wobbled\n"
-"in a disconcerting manner, his\n"
-"eyelids grew heavy, and he\n"
-"fell asleep....\n"
-	);
-	VW_UpdateScreen();
-	VW_WaitVBL(60);
-	SD_WaitSoundDone ();
-	IN_ClearKeysDown ();
-	IN_Ack();
-
-/* screen 2 of finale (15 lines) */
-	US_CenterWindow (30,21);
-	PrintY += 9;
-	US_CPrint (
-"Billy woke up, looking around the\n"
-"room, the early morning sun\n"
-"shining in his face.  Nothing.\n"
-"No vegetables to be seen.  Was it\n"
-"all just a dream?\n\n"
-"Billy's mom entered the room.\n\n"
-"\"Good morning, dear. I heard some\n"
-"news on TV that you'd be\n"
-"interested in,\" she said, sitting\n"
-"by him on the bed.\n\n"
-"\"What news?\" Billy asked,\n"
-"still groggy.\n\n"
-	);
-	VW_UpdateScreen();
-	VW_WaitVBL(60);
-	IN_ClearKeysDown ();
-	IN_Ack();
-
-/* screen 3 of finale (12 lines)*/
-	US_CenterWindow (30,21);
-	PrintY += 23;
-	US_CPrint (
-"\"The President declared today\n"
-"National 'I Hate Broccoli' Day.\n"
-"He said kids are allowed to pick\n"
-"one vegetable today, and they\n"
-"don't have to eat it.\"\n\n"
-"\"Aw, mom, I'm not afraid of any\n"
-"stupid vegetables,\" Billy said.\n"
-"\"But if it's okay with you, I'd\n"
-"rather not have any french fries\n"
-"for awhile.\"\n\n"
-"THE END"
-	);
-	VW_UpdateScreen();
-	VW_WaitVBL(60);
-	IN_ClearKeysDown ();
-	IN_Ack();
-
-}
 
 //==========================================================================
 
@@ -1898,7 +1814,6 @@ startlevel:
 			return;
 
 		case victorious:
-			GameFinale ();
 			goto done;
 		}
 
