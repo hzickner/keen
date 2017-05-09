@@ -2295,26 +2295,20 @@ USL_DoHelp(memptr text,long len)
 			}
 			if (scroll)
 			{
-				if (grmode == EGAGR)
-				{
-					VWB_Bar(WindowX,WindowY + (loc * h),WindowW,num * h,WHITE);
-					USL_DrawHelp((char far *)text,top,top + num,loc,h,lp);
 
-					pixdiv = 8;
-					base = displayofs + panadjust + (WindowX / pixdiv);
-				}
-				else if (grmode == VGAGR)
-					pixdiv = 1;
+				VWB_Bar(WindowX,WindowY + (loc * h),WindowW,num * h,WHITE);
+				USL_DrawHelp((char far *)text,top,top + num,loc,h,lp);
+
+				pixdiv = 8;
+				base = displayofs + panadjust + (WindowX / pixdiv);
 
 				if (scroll == 1)
 				{
 					srcbase = base + ylookup[WindowY + h];
 					destbase = base + ylookup[WindowY];
-					if (grmode == EGAGR)
-					{
-						EGAWRITEMODE(1);
-						VW_WaitVBL(1);
-					}
+
+					EGAWRITEMODE(1);
+					VW_WaitVBL(1);
 					VW_ScreenToScreen(srcbase,destbase,WindowW / pixdiv,
 										WindowH - h);
 				}
@@ -2327,13 +2321,10 @@ USL_DoHelp(memptr text,long len)
 					for (i = page - 1;i;i--,srcbase -= base,destbase -= base)
 						VW_ScreenToScreen(srcbase,destbase,WindowW / pixdiv,h);
 				}
-				if (grmode == EGAGR)
-				{
-					base = panadjust + (WindowX / pixdiv) +
-							ylookup[WindowY + (loc * h)];
-					VW_ScreenToScreen(base + bufferofs,base + displayofs,
-										WindowW / pixdiv,h);
-				}
+				base = panadjust + (WindowX / pixdiv) +
+						ylookup[WindowY + (loc * h)];
+				VW_ScreenToScreen(base + bufferofs,base + displayofs,
+									WindowW / pixdiv,h);
 			}
 			else
 			{

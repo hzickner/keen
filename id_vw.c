@@ -46,9 +46,6 @@
 =============================================================================
 */
 
-cardtype	videocard;		// set by VW_Startup
-grtype		grmode;			// CGAgr, EGAgr, VGAgr
-
 unsigned	bufferofs;		// hidden area to draw to before displaying
 unsigned	displayofs;		// origin of the visable screen
 unsigned	panx,pany;		// panning adjustments inside port in pixels
@@ -107,9 +104,6 @@ void	VW_Startup (void)
 
 	asm	cld;
 
-	videocard = EGAcard;
-
-	grmode = EGAGR;
 	EGAWRITEMODE(0);
 
 	cursorvisible = 0;
@@ -156,21 +150,6 @@ void VW_SetScreenMode (int grmode)
 		  geninterrupt (0x10);
 		  screenseg=0xa000;
 		  break;
-#ifdef VGAGAME
-	  case VGAGR:{
-		  char extern VGAPAL;	// deluxepaint vga pallet .OBJ file
-		  void far *vgapal = &VGAPAL;
-		  SetCool256 ();		// custom 256 color mode
-		  screenseg=0xa000;
-		  _ES = FP_SEG(vgapal);
-		  _DX = FP_OFF(vgapal);
-		  _BX = 0;
-		  _CX = 0x100;
-		  _AX = 0x1012;
-		  geninterrupt(0x10);			// set the deluxepaint pallet
-
-		  break;
-#endif
 	}
 	VW_SetLineWidth(SCREENWIDTH);
 }
