@@ -60,7 +60,6 @@ extern	void		(* aftersort) (void);
 
 void MM_Startup (void);
 void MM_Shutdown (void);
-void MM_MapEMS (void);
 
 void MM_GetPtr (memptr *baseptr,unsigned long size);
 void MM_FreePtr (memptr *baseptr);

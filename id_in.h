@@ -111,9 +111,6 @@ typedef	byte		ScanCode;
 #define	key_Delete		0x7f
 
 typedef	enum		{
-						demo_Off,demo_Record,demo_Playback,demo_PlayDone
-					} Demo;
-typedef	enum		{
 						ctrl_Keyboard,
 							ctrl_Keyboard1 = ctrl_Keyboard,ctrl_Keyboard2,
 						ctrl_Joystick,
@@ -157,7 +154,7 @@ typedef	struct		{
 extern	boolean		Keyboard[],
 					MousePresent,
 					JoysPresent[];
-extern	Demo		DemoMode;
+
 extern	boolean		Paused;
 extern	char		LastASCII;
 extern	ScanCode	LastScan;
@@ -181,12 +178,9 @@ extern	void		IN_Startup(void),IN_Shutdown(void),
 					IN_GetJoyAbs(word joy,word *xp,word *yp),
 					IN_SetupJoy(word joy,word minx,word maxx,
 								word miny,word maxy),
-					IN_StartDemoPlayback(byte _seg *buffer,word bufsize),
-					IN_StopDemo(void),IN_FreeDemoBuffer(void),
 					IN_Ack(void),IN_AckBack(void);
 extern	boolean		IN_UserInput(longword delay,boolean clear),
-					IN_IsUserInput(void),
-					IN_StartDemoRecord(word bufsize);
+					IN_IsUserInput(void);
 extern	byte		*IN_GetScanName(ScanCode);
 extern	char		IN_WaitForASCII(void);
 extern	ScanCode	IN_WaitForKey(void);

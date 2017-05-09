@@ -203,8 +203,6 @@ void	VW_ColorBorder (int color);
 void	VW_SetDefaultColors(void);
 void	VW_FadeOut(void);
 void	VW_FadeIn(void);
-void	VW_FadeUp(void);
-void	VW_FadeDown(void);
 
 //
 // block primitives

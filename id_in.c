@@ -57,7 +57,7 @@
 		boolean		Keyboard[NumCodes],
 					JoysPresent[MaxJoys],
 					MousePresent;
-		Demo		DemoMode = demo_Off;
+//		Demo		DemoMode = demo_Off;
 		boolean		Paused;
 		char		LastASCII;
 		ScanCode	LastScan;
@@ -136,9 +136,6 @@ static	Direction	DirTable[] =		// Quick lookup for total direction
 						dir_West,		dir_None,	dir_East,
 						dir_SouthWest,	dir_South,	dir_SouthEast
 					};
-
-static	byte _seg	*DemoBuffer;
-static	word		DemoOffset,DemoSize;
 
 static	void			(*INL_KeyHook)(void);
 static	void interrupt	(*OldKeyVect)(void);
@@ -752,23 +749,6 @@ register	KeyboardDef	*def;
 	mx = my = motion_None;
 	buttons = 0;
 
-	if (DemoMode == demo_Playback)
-	{
-		dbyte = DemoBuffer[DemoOffset + 1];
-		dy = (dbyte & 3) - 1;
-		dx = ((dbyte >> 2) & 3) - 1;
-		buttons = (dbyte >> 4) & 3;
-
-		if (!DemoBuffer[DemoOffset]--)
-		{
-			DemoOffset += 2;
-			if (DemoOffset >= DemoSize)
-				DemoMode = demo_PlayDone;
-		}
-	}
-	else if (DemoMode == demo_PlayDone)
-		Quit("Demo playback exceeded");
-	else
 	{
 		switch (type = Controls[player])
 		{
@@ -834,30 +814,6 @@ register	KeyboardDef	*def;
 	info->button1 = buttons & (1 << 1);
 	info->dir = DirTable[((my + 1) * 3) + (mx + 1)];
 
-	if (DemoMode == demo_Record)
-	{
-		// Pack the control info into a byte
-		dbyte = (buttons << 4) | ((dx + 1) << 2) | (dy + 1);
-
-		if
-		(
-			(DemoBuffer[DemoOffset + 1] == dbyte)
-		&&	(DemoBuffer[DemoOffset] < 254)
-		&&	DemoOffset
-		)
-			DemoBuffer[DemoOffset]++;
-		else
-		{
-			if (DemoOffset)
-				DemoOffset += 2;
-
-			if (DemoOffset >= DemoSize)
-				Quit("Demo buffer overflow");
-
-			DemoBuffer[DemoOffset] = 1;
-			DemoBuffer[DemoOffset + 1] = dbyte;
-		}
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -871,63 +827,6 @@ IN_SetControlType(int player,ControlType type)
 {
 	// DEBUG - check that type is present?
 	Controls[player] = type;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_StartDemoRecord() - Starts the demo recording, using a buffer the
-//		size passed. Returns if the buffer allocation was successful
-//
-///////////////////////////////////////////////////////////////////////////
-boolean
-IN_StartDemoRecord(word bufsize)
-{
-	if (!bufsize)
-		return(false);
-
-	MM_GetPtr((memptr *)&DemoBuffer,bufsize);
-	DemoMode = demo_Record;
-	DemoSize = bufsize & ~1;
-	DemoOffset = 0;
-
-	return(true);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_StartDemoPlayback() - Plays back the demo pointed to of the given size
-//
-///////////////////////////////////////////////////////////////////////////
-void
-IN_StartDemoPlayback(byte _seg *buffer,word bufsize)
-{
-	DemoBuffer = buffer;
-	DemoMode = demo_Playback;
-	DemoSize = bufsize & ~1;
-	DemoOffset = 0;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_StopDemoRecord() - Turns off demo mode
-//
-///////////////////////////////////////////////////////////////////////////
-void
-IN_StopDemo(void)
-{
-	DemoMode = demo_Off;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_FreeDemoBuffer() - Frees the demo buffer, if it's been allocated
-//
-///////////////////////////////////////////////////////////////////////////
-void
-IN_FreeDemoBuffer(void)
-{
-	if (DemoBuffer)
-		MM_FreePtr((memptr *)&DemoBuffer);
 }
 
 ///////////////////////////////////////////////////////////////////////////

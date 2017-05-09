@@ -230,44 +230,6 @@ void VW_FadeIn(void)
 #endif
 }
 
-void VW_FadeUp(void)
-{
-#if GRMODE == EGAGR
-	int i;
-
-	for (i=3;i<6;i++)
-	{
-	  colors[i][16] = bordercolor;
-	  _ES=FP_SEG(&colors[i]);
-	  _DX=FP_OFF(&colors[i]);
-	  _AX=0x1002;
-	  geninterrupt(0x10);
-	  VW_WaitVBL(6);
-	}
-	screenfaded = true;
-#endif
-}
-
-void VW_FadeDown(void)
-{
-#if GRMODE == EGAGR
-	int i;
-
-	for (i=5;i>2;i--)
-	{
-	  colors[i][16] = bordercolor;
-	  _ES=FP_SEG(&colors[i]);
-	  _DX=FP_OFF(&colors[i]);
-	  _AX=0x1002;
-	  geninterrupt(0x10);
-	  VW_WaitVBL(6);
-	}
-	screenfaded = false;
-#endif
-}
-
-
-
 //===========================================================================
 
 /*
