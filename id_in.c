@@ -850,23 +850,6 @@ IN_GetScanName(ScanCode scan)
 
 ///////////////////////////////////////////////////////////////////////////
 //
-//	IN_WaitForKey() - Waits for a scan code, then clears LastScan and
-//		returns the scan code
-//
-///////////////////////////////////////////////////////////////////////////
-ScanCode
-IN_WaitForKey(void)
-{
-	ScanCode	result;
-
-	while (!(result = LastScan))
-		;
-	LastScan = 0;
-	return(result);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
 //	IN_WaitForASCII() - Waits for an ASCII char, then clears LastASCII and
 //		returns the ASCII value
 //
