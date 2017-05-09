@@ -68,7 +68,7 @@ void NewGame (void)
 
 	gamestate.worldx = 0;		// spawn keen at starting spot
 
-	gamestate.mapon = 0;
+	gamestate.mapon = 1;		// direct jump to 1st level 0 = map
 	gamestate.score = 0;
 	gamestate.nextextra = 20000;
 	gamestate.lives = 3;
@@ -334,80 +334,6 @@ ResetGame(void)
 	ca_levelnum++;
 }
 
-static boolean
-MoveTitleTo(int offset)
-{
-	boolean		done;
-	int			dir,
-				chunk,
-				move;
-	longword	lasttime,delay;
-
-	if (offset < originxglobal)
-		dir = -1;
-	else
-		dir = +1;
-
-	chunk = dir * PIXGLOBAL;
-
-	done = false;
-	delay = 1;
-	while (!done)
-	{
-		lasttime = TimeCount;
-		move = delay * chunk;
-		if (chunk < 0)
-			done = originxglobal + move <= offset;
-		else
-			done = originxglobal + move >= offset;
-		if (!done)
-		{
-			RF_Scroll(move,0);
-			RF_Refresh();
-		}
-		if (IN_IsUserInput())
-			return(true);
-		delay = TimeCount - lasttime;
-	}
-	if (originxglobal != offset)
-	{
-		RF_Scroll(offset - originxglobal,0);
-		RF_Refresh();
-	}
-	return(false);
-}
-
-static boolean
-Wait(longword time)
-{
-	time += TimeCount;
-	while ((TimeCount < time) && (!IN_IsUserInput()))
-	{
-		if (!(TimeCount % MINTICS))
-			RF_Refresh();
-	}
-	return(IN_IsUserInput());
-}
-
-static boolean
-ShowText(int offset,WindowRec *wr,char *s)
-{
-	if (MoveTitleTo(offset))
-		return(true);
-
-	US_RestoreWindow(wr);
-	US_CPrint(s);
-	VW_UpdateScreen();
-
-	if (Wait(TickBase * 5))
-		return(true);
-
-	US_RestoreWindow(wr);
-	US_CPrint(s);
-	VW_UpdateScreen();
-	return(false);
-}
-
 /*
 =====================
 =
@@ -422,7 +348,6 @@ DemoLoop (void)
 	char		*s;
 	word		move;
 	longword	lasttime;
-	char *FileName1;
 	struct Shape FileShape1;
 
 	struct ffblk ffblk;
@@ -444,8 +369,7 @@ DemoLoop (void)
 
 		loadedgame = false;
 
-		FileName1 = "TITLESCR.LBM";
-		if (LoadLIBShape("KDREAMS.CMP", FileName1, &FileShape1))
+		if (LoadLIBShape("KDREAMS.CMP", "TITLESCR.LBM", &FileShape1))
 			Quit("Can't load TITLE SCREEN");
 
 		while (!restartgame && !loadedgame)
@@ -465,18 +389,11 @@ DemoLoop (void)
 				if (IN_UserInput(TickBase * 4, false))
 					break;
 
-				MoveGfxDst(0, 200);
-				UnpackEGAShapeToScreen(&FileShape1, 0, 0);
-				VW_ScreenToScreen (64*200,0,40,200);
-
-				if (IN_UserInput(TickBase * 3, false))
-					break;
-
 				displayofs = 0;
 				VWB_Bar(0,0,320,200,FIRSTCOLOR);
 				US_DisplayHighScores(-1);
 
-				if (IN_UserInput(TickBase * 6, false))
+				if (IN_UserInput(TickBase * 4, false))
 					break;
 
 			}
@@ -485,7 +402,8 @@ DemoLoop (void)
 			displayofs = dissave;
 
 			VW_FixRefreshBuffer();
-			US_ControlPanel ();
+			restartgame = gd_Easy;
+//			US_ControlPanel ();
 		}
 
 		if (!loadedgame)
