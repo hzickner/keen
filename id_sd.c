@@ -108,7 +108,6 @@ static	void			(*SoundUserHook)(void);
 static	word			SoundNumber,SoundPriority;
 static	void interrupt	(*t0OldService)(void);
 static	word			t0CountTable[] = {2,2,2,2,10,10};
-static	long			LocalTime;
 
 //	PC Sound variables
 static	byte			pcLastSample,far *pcSound;
@@ -1192,7 +1191,6 @@ static	word	count = 1,
 	if (!(--count))
 	{
 		count = t0CountTable[SoundMode];
-		LocalTime++;
 		TimeCount++;
 		if (SoundUserHook)
 			SoundUserHook();
@@ -1438,7 +1436,7 @@ SD_Startup(void)
 	SDL_InitDelay();			// SDL_InitDelay() uses t0OldService
 
 	setvect(8,SDL_t0Service);	// Set to my timer 0 ISR
-	LocalTime = TimeCount = 0;
+	TimeCount = 0;
 
 	SD_SetSoundMode(sdm_Off);
 	SD_SetMusicMode(smm_Off);
