@@ -137,7 +137,6 @@ static	Direction	DirTable[] =		// Quick lookup for total direction
 						dir_SouthWest,	dir_South,	dir_SouthEast
 					};
 
-static	void			(*INL_KeyHook)(void);
 static	void interrupt	(*OldKeyVect)(void);
 
 static	char			*ParmStrings[] = {"nojoys","nomouse",nil};
@@ -212,8 +211,7 @@ static	boolean	special;
 		special = false;
 	}
 
-	if (INL_KeyHook && !special)
-		INL_KeyHook();
+
 	outportb(0x20,0x20);
 }
 
@@ -455,7 +453,6 @@ INL_StartKbd(void)
 	OldKeyVect = getvect(KeyInt);
 	setvect(KeyInt,INL_KeyService);
 
-	INL_KeyHook = 0;	// Clear key hook
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -643,18 +640,6 @@ IN_Shutdown(void)
 	INL_ShutMouse();
 	INL_ShutKbd();
 
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_SetKeyHook() - Sets the routine that gets called by INL_KeyService()
-//			everytime a real make/break code gets hit
-//
-///////////////////////////////////////////////////////////////////////////
-void
-IN_SetKeyHook(void (*hook)())
-{
-	INL_KeyHook = hook;
 }
 
 ///////////////////////////////////////////////////////////////////////////

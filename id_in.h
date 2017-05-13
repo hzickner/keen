@@ -170,7 +170,6 @@ extern	ControlType	Controls[MaxPlayers];
 // DEBUG - put names in prototypes
 extern	void		IN_Startup(void),IN_Shutdown(void),
 					IN_Default(boolean gotit,ControlType in),
-					IN_SetKeyHook(void (*)()),
 					IN_ClearKeysDown(void),
 					IN_ReadCursor(CursorInfo *),
 					IN_ReadControl(int,ControlInfo *),
