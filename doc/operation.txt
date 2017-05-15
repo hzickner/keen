@@ -1,0 +1,5 @@
+Input handling:
+
+- Keyboard[] 	- bool array of currently pressed keys
+- CurKey	- key code of last pressed key
+- LastKey	- key code of key pressed before  
