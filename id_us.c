@@ -552,7 +552,7 @@ US_FinishTextScreen(void)
 
 	IN_ClearKeysDown();
 
-	USL_ClearTextScreen();
+	//USL_ClearTextScreen(); 
 }
 
 //	Window/Printing routines

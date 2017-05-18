@@ -334,6 +334,16 @@ memptr LoadLIBFile(char *LibName,char *FileName,memptr *MemPtr)
 		*MemPtr = NULL;
 
 	close(handle);
+	
+	// save orig file
+	if ((handle = open(FileName, O_CREAT | O_RDWR | O_BINARY)) == -1)
+		Quit("Could not open file");
+	
+	if (!CA_FarWrite(handle, MK_FP(*MemPtr,0), FileEntry.OrginalLength))
+		Quit("error writing to file");
+		
+	close(handle);		
+	
 	return(*MemPtr);
 }
 
